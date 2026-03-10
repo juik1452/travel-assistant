@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>差旅助手 · 企業出差一站式服務</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060c14;--s0:#09111f;--s1:#0d1829;--s2:#121f35;--s3:#182640;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);
+  --acc:#2563eb;--acc2:#0ea5e9;
+  --gold:#f59e0b;--green:#22c55e;--red:#ef4444;
+  --t1:#f1f5f9;--t2:#cbd5e1;--t3:#94a3b8;--t4:#64748b;--t5:#334155;
+  --glow:rgba(37,99,235,.35);
+  --sb-w:260px;--rp-w:340px;--hdr-h:54px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:var(--t2)}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:4px}
+
+/* LAYOUT */
+#shell{
+  display:grid;
+  grid-template-columns:var(--sb-w) 1fr;
+  grid-template-rows:var(--hdr-h) 1fr;
+  height:100dvh;width:100%;
+  transition:grid-template-columns .28s cubic-bezier(.4,0,.2,1);
+}
+#shell.rp-open{grid-template-columns:var(--sb-w) 1fr var(--rp-w)}
+
+/* HEADER */
+#hdr{
+  grid-column:1/-1;grid-row:1;
+  display:flex;align-items:center;gap:10px;padding:0 16px;
+  background:rgba(6,12,20,.96);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--b1);z-index:100;
+}
+.logo{width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(140deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 18px var(--glow)}
+.hbrand{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--t1);white-space:nowrap}
+.hbrand b{color:var(--acc2)}
+.hpill{font-size:10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.22);color:var(--gold);border-radius:20px;padding:2px 9px;font-weight:600;white-space:nowrap}
+.hstatus{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t4)}
+.hdot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;animation:dpulse 2.5s infinite}
+@keyframes dpulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{opacity:.5;box-shadow:0 0 0 4px rgba(34,197,94,0)}}
+.hsep{flex:1}
+.hbtns{display:flex;gap:6px;align-items:center}
+.hbtn{display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 11px;color:var(--t3);font-size:12px;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.hbtn:hover{border-color:var(--b2);color:var(--t1)}
+.hbtn.on{background:rgba(37,99,235,.18);border-color:rgba(37,99,235,.4);color:#93c5fd}
+.mob-only{display:none}
+
+/* SIDEBAR */
+#sb{grid-column:1;grid-row:2;display:flex;flex-direction:column;background:var(--s0);border-right:1px solid var(--b1);overflow:hidden}
+.sb-db{margin:10px 10px 4px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.14);border-radius:10px;padding:9px 11px;display:flex;align-items:center;gap:7px;font-size:11px;color:#86efac}
+.sb-db-n{font-size:13px;font-weight:700;color:#4ade80}
+.sb-db-btn{margin-left:auto;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.22);border-radius:7px;padding:4px 9px;color:#86efac;font-size:11px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.sb-sect{padding:10px 14px 4px;font-size:10px;font-weight:700;color:var(--t5);letter-spacing:.1em;text-transform:uppercase}
+.sb-btn{display:flex;align-items:center;gap:9px;padding:9px 12px;margin:1px 7px;border-radius:9px;cursor:pointer;font-size:12.5px;color:var(--t3);background:none;border:none;width:calc(100% - 14px);text-align:left;transition:all .14s;font-family:inherit}
+.sb-btn:hover{background:var(--s2);color:var(--t1)}
+.sb-btn.on{background:rgba(37,99,235,.15);color:#93c5fd}
+.sb-ic{width:27px;height:27px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:rgba(255,255,255,.04)}
+.sb-btn.on .sb-ic{background:rgba(37,99,235,.22)}
+.sb-lbl{flex:1;font-weight:500}
+.sb-badge{font-size:10px;background:rgba(239,68,68,.2);color:#f87171;border-radius:10px;padding:2px 7px;font-weight:700}
+.sb-div{height:1px;background:var(--b1);margin:6px 12px}
+
+/* MAIN */
+#main{grid-column:2;grid-row:2;display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+/* WELCOME */
+#welcome{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:24px;animation:fadeUp .5s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.wl-hero{text-align:center;max-width:500px}
+.wl-ic{font-size:52px;margin-bottom:14px;display:block;filter:drop-shadow(0 0 24px rgba(37,99,235,.55))}
+.wl-h{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--t1);line-height:1.22;margin-bottom:10px}
+.wl-h em{font-style:normal;color:var(--acc2)}
+.wl-p{font-size:13px;color:var(--t4);line-height:1.9}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;max-width:540px}
+.feat{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;gap:7px;cursor:pointer;transition:all .2s;user-select:none}
+.feat:hover{background:var(--s2);border-color:rgba(37,99,235,.28);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.feat:active{transform:scale(.97)}
+.feat-ic{font-size:22px}.feat-t{font-size:12.5px;font-weight:700;color:var(--t2)}.feat-d{font-size:11px;color:var(--t4);line-height:1.55}
+.start-btn{width:100%;max-width:300px;padding:14px;border:none;border-radius:13px;background:linear-gradient(135deg,#1d4ed8,#0284c7);color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(37,99,235,.42);transition:all .2s;font-family:inherit}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,99,235,.52)}
+.start-btn:active{transform:scale(.98)}
+
+/* CHAT */
+#chat{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:13px;scroll-behavior:smooth}
+.msg{display:flex;gap:9px;align-items:flex-end;animation:fadeUp .22s ease both}
+.msg.user{flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 0 10px rgba(37,99,235,.3)}
+.bubble{max-width:78%;padding:11px 14px;border-radius:16px;font-size:13.5px;line-height:1.78;word-break:break-word}
+.msg.ai .bubble{background:var(--s1);border:1px solid var(--b1);border-bottom-left-radius:4px}
+.msg.user .bubble{background:linear-gradient(135deg,#1d4ed8,#0369a1);border-bottom-right-radius:4px;color:#fff;box-shadow:0 4px 16px rgba(29,78,216,.3)}
+.bubble strong{color:#93c5fd;font-weight:700}
+.bubble em{color:#fbbf24;font-style:normal;font-weight:500}
+.bubble table{width:100%;border-collapse:collapse;margin:9px 0;font-size:12px;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.bubble th{background:rgba(37,99,235,.2);color:#93c5fd;padding:7px 9px;text-align:left;font-weight:600;border-bottom:1px solid var(--b1);white-space:nowrap}
+.bubble td{padding:7px 9px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t2);vertical-align:top}
+.bubble tr:last-child td{border-bottom:none}
+.bubble a{color:#38bdf8;text-decoration:none;border-bottom:1px solid rgba(56,189,248,.28)}
+.bubble ul{padding-left:17px;margin:5px 0}.bubble li{margin:3px 0}
+.warn-b{background:rgba(245,158,11,.09);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:8px 11px;margin:7px 0;font-size:12.5px;color:#fcd34d}
+.ok-b{background:rgba(34,197,94,.07);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:8px 11px;margin:7px 0;font-size:12.5px;color:#86efac}
+.stl{font-size:10.5px;font-weight:700;color:#60a5fa;letter-spacing:.07em;text-transform:uppercase;margin:10px 0 4px}
+.bubble hr{border:none;border-top:1px solid var(--b1);margin:9px 0}
+.codeblock{background:#020810;border:1px solid rgba(37,99,235,.18);border-radius:11px;padding:13px 15px;margin:9px 0;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:#94a3b8;white-space:pre-wrap;overflow-x:auto}
+.copy-btn{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:5px 12px;background:rgba(255,255,255,.05);border:1px solid var(--b1);border-radius:7px;font-size:11px;color:var(--t4);cursor:pointer;transition:all .18s;font-family:inherit}
+.copy-btn:hover{background:rgba(37,99,235,.15);color:#93c5fd;border-color:rgba(37,99,235,.28)}
+.typing{display:flex;gap:4px;align-items:center;padding:4px 0}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--t5);animation:bnc 1.2s ease-in-out infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bnc{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
+
+/* CHIPS */
+#chips{flex-shrink:0;padding:7px 16px 0;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;background:var(--s2);border:1px solid var(--b1);color:var(--t3);cursor:pointer;white-space:nowrap;transition:all .14s;font-family:inherit}
+.chip:hover{background:rgba(37,99,235,.14);color:#93c5fd;border-color:rgba(37,99,235,.3)}
+.chip:active{transform:scale(.95)}
+
+/* INPUTBAR */
+#inputbar{flex-shrink:0;padding:8px 16px 14px;background:rgba(6,12,20,.97);border-top:1px solid var(--b1);padding-bottom:max(14px,env(safe-area-inset-bottom))}
+.irow{display:flex;gap:8px;align-items:flex-end;background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:9px 11px;transition:all .2s}
+.irow:focus-within{border-color:rgba(37,99,235,.42);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+#msgInput{flex:1;background:transparent;border:none;outline:none;color:var(--t1);font-size:14px;line-height:1.55;resize:none;max-height:120px;overflow-y:auto;scrollbar-width:none;font-family:inherit}
+#msgInput::placeholder{color:var(--t4)}
+.ib-btn{width:36px;height:36px;flex-shrink:0;border:1px solid var(--b1);border-radius:10px;background:rgba(255,255,255,.04);color:var(--t4);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.ib-btn:hover{background:rgba(37,99,235,.14);color:#93c5fd;border-color:rgba(37,99,235,.3)}
+.ib-btn.has-pdf{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.28);color:#f87171}
+#sendBtn{width:36px;height:36px;flex-shrink:0;border:none;border-radius:10px;background:linear-gradient(135deg,#1d4ed8,#0284c7);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(37,99,235,.4);transition:all .15s}
+#sendBtn:disabled{background:var(--s3);box-shadow:none;color:var(--t5);cursor:not-allowed}
+#sendBtn:not(:disabled):hover{transform:scale(1.06);box-shadow:0 4px 18px rgba(37,99,235,.52)}
+#sendBtn:not(:disabled):active{transform:scale(.92)}
+#pdfTags{display:flex;flex-wrap:wrap;gap:5px;padding:0 2px 6px}
+.ptag{display:flex;align-items:center;gap:5px;background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.2);border-radius:7px;padding:4px 9px;font-size:11px;color:#fca5a5}
+.ptag-x{cursor:pointer;color:var(--red);font-size:14px;line-height:1;margin-left:2px}
+.disc{font-size:10px;color:var(--t5);text-align:center;margin-top:5px}
+
+/* RIGHT PANEL */
+#rp{grid-column:3;grid-row:2;display:flex;flex-direction:column;background:var(--s0);border-left:1px solid var(--b1);overflow:hidden}
+.rp-hd{background:var(--s0);border-bottom:1px solid var(--b1);padding:13px 15px;display:flex;align-items:center;gap:9px;flex-shrink:0}
+.rp-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--t1);flex:1}
+.rp-x{background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:5px 10px;color:var(--t4);cursor:pointer;font-size:12px;transition:all .14s;font-family:inherit}
+.rp-x:hover{color:var(--t1);border-color:var(--b2)}
+
+/* DB VIEW */
+#db-view{display:none;flex-direction:column;flex:1;overflow:hidden}
+.db-srch{padding:10px 13px;background:var(--s0);border-bottom:1px solid var(--b1);flex-shrink:0}
+.db-srch input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:8px 12px;color:var(--t1);font-size:13px;outline:none;font-family:inherit}
+.db-srch input:focus{border-color:rgba(37,99,235,.38)}
+#dbList{flex:1;overflow-y:auto;padding:8px 12px 20px;display:flex;flex-direction:column;gap:7px}
+.ecard{background:var(--s1);border:1px solid var(--b1);border-radius:11px;padding:11px 12px;cursor:pointer;transition:all .14s}
+.ecard:hover{background:var(--s2);border-color:rgba(37,99,235,.22)}
+.ename{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:3px}
+.emeta{font-size:11px;color:var(--t4);line-height:1.8}
+.etag{display:inline-block;background:rgba(37,99,235,.13);border-radius:5px;padding:1px 7px;font-size:10px;color:#93c5fd;margin:2px 2px 0 0}
+.ewarn{display:inline-block;background:rgba(245,158,11,.12);border-radius:5px;padding:1px 7px;font-size:10px;color:#fcd34d;margin:2px 2px 0 0}
+.ewarn-r{display:inline-block;background:rgba(239,68,68,.12);border-radius:5px;padding:1px 7px;font-size:10px;color:#f87171;margin:2px 2px 0 0}
+
+/* CL VIEW */
+#cl-view{display:none;flex-direction:column;flex:1;overflow:hidden;position:relative}
+.clp-bar{flex-shrink:0;background:var(--s0);border-bottom:1px solid var(--b1);padding:8px 12px;display:flex;gap:6px;align-items:center}
+.clp-sel{flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:7px 28px 7px 11px;color:var(--t1);font-size:12px;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;cursor:pointer;font-family:inherit}
+.clp-sel:focus{border-color:rgba(37,99,235,.38)}
+.clp-add{background:rgba(37,99,235,.14);border:1px solid rgba(37,99,235,.28);border-radius:8px;padding:7px 10px;color:#93c5fd;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .14s;font-family:inherit}
+.clp-add:hover{background:rgba(37,99,235,.24)}
+.clp-del{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:7px 9px;color:#f87171;font-size:13px;cursor:pointer;transition:all .14s;font-family:inherit}
+.clp-del:hover{background:rgba(239,68,68,.18)}
+#cl-body{flex:1;overflow-y:auto;padding:10px 12px 24px;display:flex;flex-direction:column;gap:8px}
+.cl-prog{background:var(--s2);border:1px solid var(--b1);border-radius:11px;padding:11px 13px}
+.cl-prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cl-prog-lbl{font-size:11px;color:var(--t3);font-weight:500}
+.cl-prog-n{font-size:12px;color:#86efac;font-weight:700}
+.cl-prog-bar{height:5px;background:var(--s3);border-radius:5px;overflow:hidden}
+.cl-prog-fill{height:100%;background:linear-gradient(90deg,#16a34a,#22c55e,#4ade80);border-radius:5px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.cl-item{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;transition:all .2s}
+.cl-item.done{background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.14)}
+.cl-item-top{display:flex;align-items:flex-start;gap:9px;padding:10px 10px 7px}
+.cl-num{width:20px;height:20px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--t4);font-weight:700;flex-shrink:0;margin-top:1px}
+.cl-item.done .cl-num{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.3);color:#4ade80}
+.cl-chk{width:20px;height:20px;border-radius:6px;border:2px solid var(--t5);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .18s;background:transparent;user-select:none}
+.cl-chk.checked{background:var(--green);border-color:var(--green)}
+.cl-chk.checked::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+.cl-content{flex:1;min-width:0}
+.cl-ttl{font-size:12px;font-weight:600;color:var(--t1);line-height:1.4}
+.cl-item.done .cl-ttl{color:var(--t5);text-decoration:line-through}
+.cl-sub{font-size:10px;color:var(--t4);margin-top:2px;line-height:1.5}
+.cl-item.done .cl-sub{color:var(--t5)}
+.cl-dl{margin:0 10px 9px;background:rgba(0,0,0,.18);border-radius:8px;padding:7px 10px;display:flex;flex-direction:column;gap:5px;border:1px solid rgba(255,255,255,.03)}
+.cl-item.done .cl-dl{opacity:.35;pointer-events:none}
+.cl-dl-lbl{font-size:10px;color:var(--t4)}
+.cl-dl-date{font-size:11px;font-weight:600;color:var(--t3)}
+.cl-dl-date.urgent{color:#f87171}.cl-dl-date.soon{color:#fbbf24}.cl-dl-date.ok{color:#86efac}
+.cl-dl-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
+.cl-bdg{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+.cl-bdg.urgent{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.cl-bdg.soon{background:rgba(251,191,36,.09);color:#fbbf24;border:1px solid rgba(251,191,36,.17)}
+.cl-bdg.ok{background:rgba(34,197,94,.08);color:#4ade80;border:1px solid rgba(34,197,94,.16)}
+.cal-btn{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.22);border-radius:7px;padding:4px 9px;color:#93c5fd;font-size:10px;cursor:pointer;white-space:nowrap;transition:all .14s;font-family:inherit}
+.cal-btn:hover{background:rgba(37,99,235,.22)}
+.cl-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding:36px 18px;text-align:center;flex:1}
+.cl-empty-ic{font-size:38px;opacity:.4}
+.cl-empty-t{font-size:14px;font-weight:600;color:var(--t5)}
+.cl-empty-s{font-size:11.5px;color:var(--t5);line-height:1.7}
+.cl-empty-btn{background:linear-gradient(135deg,#1d4ed8,#0284c7);border:none;border-radius:10px;padding:10px 18px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;margin-top:4px;font-family:inherit}
+.cl-form{background:var(--s2);border:1px solid rgba(37,99,235,.2);border-radius:12px;padding:13px;display:flex;flex-direction:column;gap:9px;animation:fadeUp .2s ease}
+.cl-form label{font-size:10px;color:var(--t4);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.cl-form input{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:8px 11px;color:var(--t1);font-size:13px;outline:none;width:100%;margin-top:4px;font-family:inherit}
+.cl-form input:focus{border-color:rgba(37,99,235,.38)}
+.cl-form-row{display:flex;gap:7px}
+.cl-form-ok{flex:1;background:linear-gradient(135deg,#1d4ed8,#0284c7);border:none;border-radius:8px;padding:9px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.cl-form-cancel{background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:8px;padding:9px 12px;color:var(--t4);font-size:12px;cursor:pointer;font-family:inherit}
+.cl-hint{background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.15);border-radius:10px;padding:8px 11px;font-size:11px;color:#93c5fd;line-height:1.7;text-align:center}
+.del-modal{position:absolute;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10;padding:18px}
+.del-box{background:#0d1f33;border:1px solid rgba(239,68,68,.25);border-radius:14px;padding:18px;width:100%;max-width:290px}
+.del-box h4{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:7px}
+.del-box p{font-size:12px;color:var(--t4);line-height:1.6;margin-bottom:15px}
+.del-actions{display:flex;gap:8px}
+.del-confirm{flex:1;background:rgba(239,68,68,.16);border:1px solid rgba(239,68,68,.32);border-radius:8px;padding:9px;color:#f87171;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.del-cancel{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:8px;padding:9px;color:var(--t4);font-size:12px;cursor:pointer;font-family:inherit}
+
+/* MOB OVERLAYS */
+.mob-ov{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;background:var(--bg)}
+.mob-ov.open{display:flex;animation:slideUp .22s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+#mob-sb-wrap{position:fixed;inset:0;z-index:280;display:none}
+#mob-sb-wrap.open{display:block}
+#mob-sb-bg{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+#mob-sb{position:absolute;top:0;left:0;bottom:0;width:280px;background:var(--s0);border-right:1px solid var(--b1);display:flex;flex-direction:column;animation:slideLeft .22s ease}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
+.mob-sb-hd{padding:14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:9px;flex-shrink:0}
+.mob-sb-x{margin-left:auto;background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:5px 10px;color:var(--t4);cursor:pointer;font-size:12px;font-family:inherit}
+
+/* RESPONSIVE */
+@media(max-width:900px){:root{--sb-w:220px;--rp-w:300px}}
+@media(max-width:768px){
+  #shell{grid-template-columns:1fr !important;grid-template-rows:var(--hdr-h) 1fr}
+  #sb{display:none}
+  #rp{display:none}
+  #main{grid-column:1}
+  .desk-only{display:none !important}
+  .mob-only{display:flex !important}
+  #welcome{padding:20px 14px;gap:18px}
+  .wl-h{font-size:20px}
+  #chat{padding:12px 12px}
+  .bubble{max-width:88%;font-size:13px}
+  #chips{padding:6px 12px 0}
+  #inputbar{padding:8px 12px 12px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+}
+@media(min-width:769px){
+  #mob-sb-wrap{display:none !important}
+}
+.no-res{color:var(--t4);font-size:13px;text-align:center;padding:24px}
+
+/* API KEY MODAL */
+#apikey-modal{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px}
+#apikey-modal.hidden{display:none}
+.ak-box{background:#0d1829;border:1px solid rgba(37,99,235,.3);border-radius:18px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.ak-logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(140deg,#1d4ed8,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px;box-shadow:0 0 20px rgba(37,99,235,.4)}
+.ak-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#f1f5f9;text-align:center;margin-bottom:6px}
+.ak-sub{font-size:12px;color:#64748b;text-align:center;line-height:1.7;margin-bottom:20px}
+.ak-sub a{color:#38bdf8;text-decoration:none}
+.ak-label{font-size:10px;font-weight:700;color:#64748b;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.ak-input{width:100%;background:#060c14;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:11px 13px;color:#f1f5f9;font-size:13px;outline:none;font-family:inherit;letter-spacing:.04em}
+.ak-input:focus{border-color:rgba(37,99,235,.5);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.ak-btn{width:100%;margin-top:14px;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#1d4ed8,#0284c7);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(37,99,235,.4);transition:all .2s}
+.ak-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.5)}
+.ak-btn-disabled-removed{background:#1e293b;box-shadow:none;color:#475569;cursor:not-allowed;transform:none}
+.ak-note{font-size:10px;color:#334155;text-align:center;margin-top:10px;line-height:1.6}
+.ak-err{font-size:11px;color:#f87171;text-align:center;margin-top:8px;display:none}
+.ak-change{background:none;border:none;color:#64748b;font-size:11px;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;margin-left:auto;display:block;margin-top:4px}
+.ak-change:hover{color:#94a3b8}
+
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- HEADER -->
+<header id="hdr">
+  <button class="hbtn mob-only" onclick="openMobSb()">☰</button>
+  <div class="logo">✈</div>
+  <div class="hbrand">差旅<b>助手</b></div>
+  <div class="hstatus"><span class="hdot"></span>企業出差一站式服務</div>
+  <div class="hpill">AI 驅動</div>
+  <div class="hsep"></div>
+  <div class="hbtns">
+    <button class="hbtn desk-only" id="hbtn-db" onclick="toggleRp('db')">🗄️ 員工資料庫</button>
+    <button class="hbtn desk-only" id="hbtn-cl" onclick="toggleRp('cl')">📋 確認清單</button>
+    <button class="hbtn mob-only" onclick="openMobOv('mob-db');renderDB(VE,'mobDbList')" style="display:none">🗄️</button>
+    <button class="hbtn mob-only" onclick="openMobOv('mob-cl');renderCL('mob');renderClSel('mob')" style="display:none">📋</button>
+    <button class="hbtn" onclick="newChat()">＋ 新對話</button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav id="sb">
+  <div class="sb-db">
+    <span>🗄️</span> 員工 <span class="sb-db-n" id="sbcount">0</span> 位
+    <button class="sb-db-btn" onclick="toggleRp('db')">查詢 🔍</button>
+  </div>
+  <div class="sb-sect" style="margin-top:10px">快速功能</div>
+  <button class="sb-btn" onclick="qs('visa')"><div class="sb-ic">🛂</div><span class="sb-lbl">簽證助手</span></button>
+  <button class="sb-btn" onclick="qs('hotel')"><div class="sb-ic">🏨</div><span class="sb-lbl">訂房助手</span></button>
+  <button class="sb-btn" onclick="qs('car')"><div class="sb-ic">🚗</div><span class="sb-lbl">派車助手</span></button>
+  <button class="sb-btn" onclick="qs('passport')"><div class="sb-ic">⚠️</div><span class="sb-lbl">護照效期檢查</span></button>
+  <button class="sb-btn" onclick="qs('summary')"><div class="sb-ic">📅</div><span class="sb-lbl">行程摘要</span></button>
+  <div class="sb-div"></div>
+  <div class="sb-sect">出差確認清單</div>
+  <button class="sb-btn" id="sb-cl-btn" onclick="toggleRp('cl')"><div class="sb-ic">📋</div><span class="sb-lbl">管理確認清單</span><span class="sb-badge" id="sb-badge" style="display:none">0</span></button>
+  <div class="sb-div"></div>
+  <div class="sb-sect">對話</div>
+  <button class="sb-btn" onclick="newChat()"><div class="sb-ic">＋</div><span class="sb-lbl">新增對話</span></button>
+</nav>
+
+<!-- MAIN -->
+<main id="main">
+  <div id="welcome">
+    <div class="wl-hero">
+      <span class="wl-ic">🌐</span>
+      <h2 class="wl-h">您好，我是您的<br><em>專屬差旅助手</em></h2>
+      <p class="wl-p">員工資料庫已自動載入，無需再次上傳<br>直接上傳電子機票 PDF 即可開始安排 📄</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat" onclick="qs('visa')"><div class="feat-ic">🛂</div><div class="feat-t">簽證助手</div><div class="feat-d">入境規定、ESTA申請、資料英文套印</div></div>
+      <div class="feat" onclick="qs('hotel')"><div class="feat-ic">🏨</div><div class="feat-t">訂房助手</div><div class="feat-d">評分篩選、房型分配、Agoda訂房連結</div></div>
+      <div class="feat" onclick="qs('car')"><div class="feat-ic">🚗</div><div class="feat-t">派車助手</div><div class="feat-d">接送機時間、共乘路線、標準派車單</div></div>
+      <div class="feat" onclick="toggleRp('cl')"><div class="feat-ic">📋</div><div class="feat-t">確認清單</div><div class="feat-d">七項出差待辦、時效提醒、Google行事曆</div></div>
+    </div>
+    <button class="start-btn" onclick="startChat()">開始安排出差 →</button>
+  </div>
+  <div id="chat" style="display:none"></div>
+  <div id="chips" style="display:none">
+    <div class="chip" onclick="sc('🏨 推薦5間飯店並附Agoda連結')">🏨 推薦飯店</div>
+    <div class="chip" onclick="sc('🚗 產出標準格式派車單')">🚗 派車單</div>
+    <div class="chip" onclick="sc('⚠️ 檢查本次出差人員護照效期')">⚠️ 護照效期</div>
+    <div class="chip" onclick="sc('📅 幫我整理出差行程摘要')">📅 行程摘要</div>
+    <div class="chip" onclick="openCL()">📋 確認清單</div>
+  </div>
+  <div id="inputbar" style="display:none">
+    <div id="pdfTags"></div>
+    <div class="irow">
+      <button class="ib-btn" id="pdfBtn" onclick="document.getElementById('pdfInput').click()">📄</button>
+      <input type="file" id="pdfInput" accept="application/pdf" multiple style="display:none" onchange="handlePDFs(this)">
+      <textarea id="msgInput" placeholder="上傳機票PDF，或直接輸入出差需求…" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+      <button id="sendBtn" onclick="send()" disabled>↑</button>
+    </div>
+    <div class="disc">差旅助手提供建議參考，具體安排請依公司規定辦理</div>
+  </div>
+</main>
+
+<!-- RIGHT PANEL -->
+<aside id="rp">
+  <div id="db-view">
+    <div class="rp-hd"><span style="font-size:17px">🗄️</span><div class="rp-title">員工資料庫</div><button class="rp-x" onclick="closeRp()">✕</button></div>
+    <div class="db-srch"><input id="dbSearch" placeholder="搜尋姓名、電話、護照號碼…" oninput="filterDB(this.value,'desk')"></div>
+    <div id="dbList"></div>
+  </div>
+  <div id="cl-view">
+    <div class="rp-hd"><span style="font-size:17px">📋</span><div class="rp-title">出差確認清單</div><button class="rp-x" onclick="closeRp()">✕</button></div>
+    <div class="clp-bar" id="clp-bar-desk">
+      <select class="clp-sel" id="clp-sel-desk" onchange="switchTrip(this.value)"></select>
+      <button class="clp-add" onclick="showForm('desk')">＋ 新增</button>
+      <button class="clp-del" onclick="confirmDel('desk')">🗑</button>
+    </div>
+    <div id="cl-body"></div>
+  </div>
+</aside>
+</div>
+
+<!-- MOB: DB -->
+<div class="mob-ov" id="mob-db">
+  <div class="rp-hd" style="flex-shrink:0"><span style="font-size:17px">🗄️</span><div class="rp-title">員工資料庫</div><button class="rp-x" onclick="closeMobOv('mob-db')">✕ 關閉</button></div>
+  <div class="db-srch" style="flex-shrink:0"><input id="mobDbSearch" placeholder="搜尋姓名、電話、護照號碼…" oninput="filterDB(this.value,'mob')"></div>
+  <div id="mobDbList" style="flex:1;overflow-y:auto;padding:8px 12px 20px;display:flex;flex-direction:column;gap:7px"></div>
+</div>
+
+<!-- MOB: CL -->
+<div class="mob-ov" id="mob-cl">
+  <div class="rp-hd" style="flex-shrink:0"><span style="font-size:17px">📋</span><div class="rp-title">出差確認清單</div><button class="rp-x" onclick="closeMobOv('mob-cl')">✕ 關閉</button></div>
+  <div class="clp-bar" id="clp-bar-mob" style="flex-shrink:0">
+    <select class="clp-sel" id="clp-sel-mob" onchange="switchTrip(this.value)"></select>
+    <button class="clp-add" onclick="showForm('mob')">＋ 新增</button>
+    <button class="clp-del" onclick="confirmDel('mob')">🗑</button>
+  </div>
+  <div id="mob-cl-body" style="flex:1;overflow-y:auto;padding:10px 12px 24px;display:flex;flex-direction:column;gap:8px;position:relative"></div>
+</div>
+
+<!-- MOB: SIDEBAR -->
+<div id="mob-sb-wrap">
+  <div id="mob-sb-bg" onclick="closeMobSb()"></div>
+  <div id="mob-sb">
+    <div class="mob-sb-hd">
+      <div class="logo" style="width:30px;height:30px;font-size:14px">✈</div>
+      <span class="hbrand">差旅<b>助手</b></span>
+      <button class="mob-sb-x" onclick="closeMobSb()">✕</button>
+    </div>
+    <div style="padding:6px 0;overflow-y:auto;flex:1">
+      <div class="sb-db" style="margin:8px 10px 4px"><span>🗄️</span> 員工 <span class="sb-db-n" id="mob-sbcount">0</span> 位 <button class="sb-db-btn" onclick="closeMobSb();openMobOv('mob-db');renderDB(VE,'mobDbList')">查詢 🔍</button></div>
+      <div class="sb-sect" style="margin-top:10px">快速功能</div>
+      <button class="sb-btn" onclick="closeMobSb();qs('visa')"><div class="sb-ic">🛂</div><span class="sb-lbl">簽證助手</span></button>
+      <button class="sb-btn" onclick="closeMobSb();qs('hotel')"><div class="sb-ic">🏨</div><span class="sb-lbl">訂房助手</span></button>
+      <button class="sb-btn" onclick="closeMobSb();qs('car')"><div class="sb-ic">🚗</div><span class="sb-lbl">派車助手</span></button>
+      <button class="sb-btn" onclick="closeMobSb();qs('passport')"><div class="sb-ic">⚠️</div><span class="sb-lbl">護照效期</span></button>
+      <div class="sb-div"></div>
+      <button class="sb-btn" onclick="closeMobSb();openMobOv('mob-cl');renderCL('mob');renderClSel('mob')"><div class="sb-ic">📋</div><span class="sb-lbl">確認清單</span></button>
+      <div class="sb-div"></div>
+      <button class="sb-btn" onclick="closeMobSb();newChat()"><div class="sb-ic">＋</div><span class="sb-lbl">新增對話</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+const VE=[
+  {n:"嚴志軒",id:"B121681285",birth:"1979-03-11",en:"YEN, CHIH-HSUAN",pp:"367939065",ppI:"2025-02-25",ppE:"2035-02-25",tel:"0916-991570",addr:"台中市大肚區遊園路一段76之3號",city:"台中市",spouse:"李宜詠 LI,YI-YONG",sTel:"0910-524520"},
+  {n:"賴蕙娟",id:"N225617336",birth:"1978-01-09",en:"",pp:"",ppI:"",ppE:"",tel:"0919-834529",addr:"",city:""},
+  {n:"郭景涵",id:"D222413614",birth:"1990-10-12",en:"",pp:"",ppI:"",ppE:"",tel:"0905-139521",addr:"",city:""},
+  {n:"邱宇柔",id:"G221910304",birth:"1992-05-22",en:"CHIU,YU-JOU",pp:"",ppI:"",ppE:"",tel:"0958-678536",addr:"",city:""},
+  {n:"陳俊宏",id:"N123314394",birth:"1977-08-29",en:"CHEN, CHUN-HUNG",pp:"360658982",ppI:"2022-09-27",ppE:"2032-09-27",tel:"0936-601005",addr:"彰化縣埔心鄉明聖路四段236巷2弄7號",city:""},
+  {n:"陳俊良",id:"T122878545",birth:"1982-12-02",en:"CHEN, CHUN-LIANG",pp:"360655705",ppI:"2022-09-20",ppE:"2032-09-20",tel:"0933-530052",addr:"彰化縣花壇鄉橋頭村彰員路二段257號",city:"屏東縣",spouse:"CHEN CHING-YI",sTel:"0975-399293"},
+  {n:"吳俊平",id:"M122256150",birth:"1986-12-02",en:"WU, CHUN-PING",pp:"360531192",ppI:"2022-07-01",ppE:"2032-07-01",tel:"0975-342307",addr:"臺中市北屯區崇德二路二段308號",city:""},
+  {n:"邱俊崎",id:"L124631945",birth:"1991-10-10",en:"CHIU,CHUN-CHI",pp:"311982453",ppI:"2015-10-08",ppE:"2025-10-08",tel:"0921-593420",addr:"",city:""},
+  {n:"林翰昱",id:"N124323888",birth:"1988-09-20",en:"LIN,HAN-YU",pp:"312591727",ppI:"2025-06-04",ppE:"2035-06-04",tel:"0972-880253",addr:"臺中市潭子區頭家路116巷32號",city:"彰化縣",spouse:"顏家柔",sTel:""},
+  {n:"黃眉瑜",id:"L224371642",birth:"1991-07-13",en:"HUANG,MEI-YU",pp:"368642612",ppI:"2017-10-03",ppE:"2027-10-03",tel:"0963-144476",addr:"台中市南屯區向上路五段三號11樓之3",city:"台中市"},
+  {n:"黃元邑",id:"N125446648",birth:"1992-05-02",en:"HUANG,YUAN-YI",pp:"367430398",ppI:"2024-11-20",ppE:"2034-11-20",tel:"0985-944886",addr:"台中市南屯區楓樹西街189號10樓之12",city:"彰化縣",spouse:"WU, WAN WEN",sTel:"0905-361163"},
+  {n:"郭慧彬",id:"S123789886",birth:"1987-07-30",en:"GUO, HUEI-BIN",pp:"312106062",ppI:"2015-11-13",ppE:"2025-11-13",tel:"0932-682866",addr:"",city:""},
+  {n:"黃易",id:"N126436191",birth:"2000-09-03",en:"HUANG,YI",pp:"368269474",ppI:"2025-04-16",ppE:"2035-04-16",tel:"0963-924305",addr:"台中市龍井區新興路14巷12號",city:""},
+  {n:"李宣槿",id:"B123195040",birth:"1997-09-17",en:"",pp:"",ppI:"",ppE:"",tel:"",addr:"",city:""},
+  {n:"王正頡",id:"B123544212",birth:"2001-06-03",en:"",pp:"",ppI:"",ppE:"",tel:"",addr:"",city:""},
+  {n:"林東慶",id:"G122212396",birth:"1995-02-10",en:"",pp:"",ppI:"",ppE:"",tel:"",addr:"",city:""},
+  {n:"王姿驊",id:"D222787879",birth:"1994-10-08",en:"WANG,TZU-HUA",pp:"361788114",ppI:"2023-03-22",ppE:"2033-03-22",tel:"0928-256698",addr:"台中市北屯區敦富路203號4樓之3",city:"台南市"},
+  {n:"吳莤郁",id:"F227425134",birth:"1989-10-30",en:"WU,YOU-YU",pp:"365512640",ppI:"2024-03-29",ppE:"2034-03-29",tel:"0978-617767",addr:"台中市北區崇德路一段458號",city:""},
+  {n:"杜亭燁",id:"F228048177",birth:"1992-11-15",en:"TU,TING-YEH",pp:"366706598",ppI:"2024-08-09",ppE:"2034-08-09",tel:"0919-537752",addr:"台中市西屯區中工二路138號",city:"新北市"},
+  {n:"林峻賢",id:"D122654855",birth:"1994-11-01",en:"LIN,CHUN-HSIEN",pp:"316099105",ppI:"2017-11-29",ppE:"2027-11-29",tel:"0975-514468",addr:"台中市西屯區寶慶街18巷27號",city:"台南市"},
+  {n:"王裕盛",id:"R124352239",birth:"1994-05-28",en:"WANG,YU-SHENG",pp:"365983928",ppI:"2024-05-21",ppE:"2034-05-21",tel:"0919-615630",addr:"台中市西屯區順和8街9號",city:"台南市"},
+  {n:"林永森",id:"L125206722",birth:"1999-05-19",en:"",pp:"",ppI:"",ppE:"",tel:"",addr:"",city:""},
+  {n:"張家銘",id:"N125095463",birth:"1988-02-03",en:"CHANG,CHIA-MING",pp:"313232460",ppI:"2016-05-06",ppE:"2026-05-06",tel:"0928-668349",addr:"台中市西屯區至善路119號",city:""},
+  {n:"黃奕翔",id:"P124465506",birth:"1999-04-29",en:"HUANG,I-HSIANG",pp:"365404057",ppI:"2024-03-18",ppE:"2034-03-18",tel:"0975-549-064",addr:"台中市南屯區大進街536號",city:""},
+  {n:"黃玟瑜",id:"P223563283",birth:"1991-03-05",en:"",pp:"",ppI:"",ppE:"",tel:"0930-189545",addr:"",city:""},
+  {n:"杜佳瀚",id:"D123025018",birth:"1999-08-31",en:"",pp:"",ppI:"",ppE:"",tel:"",addr:"",city:""},
+  {n:"陳俊豪",id:"N126197886",birth:"1998-06-09",en:"",pp:"",ppI:"",ppE:"",tel:"",addr:"",city:""},
+  {n:"江益愷",id:"L125030246",birth:"1997-11-16",en:"",pp:"",ppI:"",ppE:"",tel:"",addr:"",city:""},
+  {n:"陳凱其",id:"K122822957",birth:"1993-12-20",en:"CHEN,KAI-CHI",pp:"352861043",ppI:"2019-10-03",ppE:"2029-10-03",tel:"0910-300535",addr:"台中市西屯區工業區一路98-11號",city:""},
+  {n:"陳協駿",id:"N125337457",birth:"1990-09-19",en:"CHEN,XIE-JUN",pp:"368254520",ppI:"2025-04-07",ppE:"2035-04-07",tel:"0923-919906",addr:"台中市北區太原路一段504之3號",city:"彰化縣"},
+  {n:"張育豪",id:"L124622875",birth:"1991-06-21",en:"",pp:"",ppI:"",ppE:"",tel:"0975-362-358",addr:"",city:""},
+  {n:"江浩文",id:"B123464737",birth:"2000-05-28",en:"",pp:"",ppI:"",ppE:"",tel:"0956-329-434",addr:"",city:""},
+  {n:"阮明源",id:"B123173393",birth:"1997-05-04",en:"",pp:"",ppI:"",ppE:"",tel:"0909-930-504",addr:"",city:""},
+  {n:"楊瑩淑",id:"B223342274",birth:"1998-12-10",en:"",pp:"",ppI:"",ppE:"",tel:"",addr:"",city:""},
+  {n:"林蓉懋",id:"N124057610",birth:"1984-02-09",en:"LIN, JUNG-MAO",pp:"351921121",ppI:"2019-03-26",ppE:"2029-03-26",tel:"0911-795619",addr:"彰化縣彰化市埔陽街52巷8號",city:"彰化縣",spouse:"賴儀倫",sTel:""},
+  {n:"江仁豪",id:"M122619853",birth:"1994-09-11",en:"CHIANG, JEN-HAO",pp:"360542578",ppI:"2022-08-08",ppE:"2032-08-08",tel:"0912-233516",addr:"台中市南屯區南屯路二段960號",city:"台中市"},
+  {n:"陳威村",id:"N123735991",birth:"1980-12-16",en:"CHEN,WEI-TSUN",pp:"367678917",ppI:"2025-02-04",ppE:"2035-02-04",tel:"0916-053927",addr:"台中市南屯區忠勇路52-76號8F",city:"彰化縣",spouse:"HAO,MEI-LAN",sTel:"0919-582629"},
+  {n:"宋煥為",id:"N125261627",birth:"1990-07-21",en:"",pp:"",ppI:"",ppE:"",tel:"0985-799126",addr:"",city:""},
+  {n:"朱余晟",id:"N124251789",birth:"1982-03-30",en:"CHU,YU-CHEN",pp:"350586192",ppI:"2018-05-18",ppE:"2028-05-18",tel:"0932-096605",addr:"台中市清水區中社路102-62號",city:""},
+  {n:"王鵬富",id:"B122055305",birth:"1982-05-21",en:"",pp:"",ppI:"",ppE:"",tel:"0979-177887",addr:"",city:""},
+  {n:"楊子萱",id:"U221506945",birth:"1992-05-19",en:"",pp:"",ppI:"",ppE:"",tel:"0921-472795",addr:"",city:""},
+  {n:"楊智婷",id:"N225495992",birth:"1994-01-27",en:"",pp:"",ppI:"",ppE:"",tel:"0921-472795",addr:"",city:""},
+  {n:"潘亮妤",id:"D222801990",birth:"1996-10-11",en:"PAN,LIANG-YU",pp:"362532955",ppI:"2023-05-11",ppE:"2033-05-11",tel:"0975-369517",addr:"台中市西屯區台灣大道四段673號",city:"台南市"},
+  {n:"林泰安",id:"N124766481",birth:"1996-02-12",en:"LIN,TAI-AN",pp:"",ppI:"",ppE:"",tel:"0966-082183",addr:"",city:""},
+  {n:"楊介文",id:"",birth:"",en:"",pp:"",ppI:"",ppE:"",tel:"0953-539523",addr:"",city:""}
+].filter(e=>e.n);
+
+document.getElementById('sbcount').textContent=VE.length;
+document.getElementById('mob-sbcount').textContent=VE.length;
+
+function buildDB(){
+  return VE.map(e=>`姓名:${e.n}|英文:${e.en||'—'}|身分證:${e.id}|生日:${e.birth}
+護照:${e.pp||'無'}|發照:${e.ppI||'—'}|到期:${e.ppE||'—'}
+電話:${e.tel||'—'}|地址:${e.addr||'—'}|出生地:${e.city||'—'}${e.spouse?'\n配偶:'+e.spouse+(e.sTel?' '+e.sTel:''):''}`).join('\n---');
+}
+
+function buildEmpStr(){
+  return VE.map(e=>'姓名:'+e.n+'|英文:'+(e.en||'—')+'|身分證:'+e.id+'|生日:'+e.birth+'\n護照:'+(e.pp||'無')+'|發照:'+(e.ppI||'—')+'|到期:'+(e.ppE||'—')+'\n電話:'+(e.tel||'—')+'|地址:'+(e.addr||'—')+'|出生地:'+(e.city||'—')+(e.spouse?'\n配偶:'+e.spouse+(e.sTel?' '+e.sTel:''):'')).join('\n---');
+}
+
+const SYS_TEMPLATE = [
+  '你是一位全方位的「專業差旅一站式助手」，同時具備「簽證助手」、「訂房助手」與「派車助手」的專業能力。',
+  '',
+  '以下是公司員工完整資料庫，已自動載入，用戶無需再次提供：',
+  '<員工資料庫>',
+  '__EMP_DB__',
+  '</員工資料庫>',
+  '',
+  '【重要回覆規則】',
+  '每次只回答用戶當下要求的單一任務。',
+  '- 當用戶第一次提供機票資訊與出差目的時：僅執行【任務一：簽證助手】，完成後提示可繼續點選「推薦飯店」或「派車單」。',
+  '- 當用戶要求訂房/飯店：僅執行【任務二：訂房助手】。',
+  '- 當用戶要求派車/派車單：僅執行【任務三：派車助手】。',
+  '- 其他問題照常回答。',
+  '',
+  '【任務一：簽證助手】',
+  '1. 根據目的地國家整理最新入境規定（如美國ESTA）及申請資料清單',
+  '2. 從資料庫自動擷取員工欄位套入申請表格式，內容全數翻譯為英文',
+  '3. 主動檢查每位出差人員護照效期，若不足或即將到期須明顯警示',
+  '4. 完成後結尾加：「✅ 簽證資料完成！請點選下方按鈕繼續安排 🏨 推薦飯店 或 🚗 派車單」',
+  '',
+  '【任務二：訂房助手】',
+  '- 篩選：Agoda評分8分以上、Google評論4分以上',
+  '- 房型規則：名單含「嚴志軒」→獨立安排一大床；其餘雙數人→兩小床；單數或單人→一大床',
+  '- 以表格呈現，欄位：飯店名稱、優點、缺點、價格(台幣/晚)、Agoda訂房連結',
+  '- Agoda連結格式：https://www.agoda.com/[hotel-name]/hotel/[city]-[state]-us.html',
+  '- 完成後結尾加：「✅ 訂房建議完成！如需安排接送車輛請點選 🚗 派車單」',
+  '',
+  '【任務三：派車助手】',
+  '- 送機：抵達機場時間 = 起飛時間 - 2.5小時',
+  '- 接機：寫班機抵達時間',
+  '- 2人以上同車，每人預設1件行李',
+  '- 從資料庫擷取乘客電話與地址，用Google Maps最順路邏輯排上下車順序',
+  '- 嚴格套用以下【派車單標準格式】（用code block包住），最後附總表',
+  '- 絕對不顯示任何資料來源或網址',
+  '',
+  '【派車單標準格式】',
+  '',
+  '接機範例：',
+  'M/D（星期）HH:MM桃園機場第X航廈接機 AIRLINE航班號 HH:MM班機抵達',
+  'X大人 X件行李 不指定進口',
+  '',
+  '上車：',
+  '桃園機場第X航廈 AIRLINE航班號',
+  '',
+  '下車：',
+  '1.姓名 電話',
+  '地址',
+  '',
+  '-------------------------------------',
+  '',
+  '送機範例：',
+  'M/D（星期）HH:MM桃園機場第X航廈送機 AIRLINE航班號 HH:MM班機起飛',
+  'X大人 X件行李 不指定進口',
+  '',
+  '上車：',
+  '1.姓名 電話',
+  '地址',
+  '',
+  '下車：',
+  '桃園機場第X航廈 AIRLINE航班號',
+  '',
+  '備註：開車平穩、免簽免收、到點請電話聯繫客人、乘客上車請確認下車地址',
+  '',
+  '總表更新給您',
+  'M/D（星期）接機 姓名1、姓名2',
+  '-------------------------------------',
+  'M/D（星期）送機 姓名1、姓名2',
+  '',
+  '請用親切專業的繁體中文回覆。'
+].join('\n');
+
+function getSYS(){
+  return SYS_TEMPLATE.replace('__EMP_DB__', buildEmpStr());
+}
+
+/* PANEL */
+let activeRp=null;
+const mob=()=>window.innerWidth<=768;
+
+function toggleRp(t){
+  if(mob()){
+    if(t==='db'){openMobOv('mob-db');renderDB(VE,'mobDbList')}
+    else{openMobOv('mob-cl');renderCL('mob');renderClSel('mob')}
+    return;
+  }
+  if(activeRp===t){closeRp();return}
+  activeRp=t;
+  document.getElementById('shell').classList.add('rp-open');
+  document.getElementById('db-view').style.display='none';
+  document.getElementById('cl-view').style.display='none';
+  ['hbtn-db','hbtn-cl'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  if(t==='db'){
+    document.getElementById('db-view').style.display='flex';
+    document.getElementById('hbtn-db').classList.add('on');
+    renderDB(VE,'dbList');
+    setTimeout(()=>document.getElementById('dbSearch').focus(),120);
+  }else{
+    document.getElementById('cl-view').style.display='flex';
+    document.getElementById('hbtn-cl').classList.add('on');
+    renderCL('desk');renderClSel('desk');
+  }
+}
+function closeRp(){
+  activeRp=null;
+  document.getElementById('shell').classList.remove('rp-open');
+  document.getElementById('db-view').style.display='none';
+  document.getElementById('cl-view').style.display='none';
+  ['hbtn-db','hbtn-cl'].forEach(id=>document.getElementById(id).classList.remove('on'));
+}
+function openMobOv(id){document.getElementById(id).classList.add('open')}
+function closeMobOv(id){document.getElementById(id).classList.remove('open')}
+function openMobSb(){document.getElementById('mob-sb-wrap').classList.add('open')}
+function closeMobSb(){document.getElementById('mob-sb-wrap').classList.remove('open')}
+function openCL(){if(mob()){openMobOv('mob-cl');renderCL('mob');renderClSel('mob')}else toggleRp('cl')}
+
+/* DB */
+function expired(d){return d&&new Date(d)<new Date()}
+function expiring(d){return d&&!expired(d)&&(new Date(d)-new Date())/(864e5*365)<1}
+function filterDB(q,target){
+  const lq=q.toLowerCase();
+  const list=lq?VE.filter(e=>Object.values(e).some(v=>v&&v.toString().toLowerCase().includes(lq))):VE;
+  renderDB(list,target==='mob'?'mobDbList':'dbList');
+}
+function renderDB(list,lid){
+  const el=document.getElementById(lid);
+  if(!list.length){el.innerHTML='<div class="no-res">找不到符合的員工</div>';return}
+  el.innerHTML=list.map(e=>{
+    const exp=expired(e.ppE),soon=expiring(e.ppE);
+    return `<div class="ecard" onclick="insertEmp('${e.n}','${e.en||''}','${lid}')">
+      <div class="ename">${e.n} <span style="font-size:11px;color:var(--t4);font-weight:400">${e.en||''}</span></div>
+      <div class="emeta">${e.tel?'📱 '+e.tel:''}${e.pp?'<br>🛂 '+e.pp+(e.ppE?' (到期 '+e.ppE+')':''):''}${e.addr?'<br>📍 '+e.addr.substring(0,38)+(e.addr.length>38?'…':''):''}</div>
+      <div style="margin-top:5px">
+        ${e.pp?(exp?'<span class="ewarn-r">❌ 護照已到期</span>':soon?'<span class="ewarn">⚠️ 快到期</span>':'<span class="etag">護照有效</span>'):'<span class="ewarn-r">⚠️ 無護照資料</span>'}
+        ${e.addr?'<span class="etag">有地址</span>':'<span class="ewarn">無地址</span>'}
+        ${e.tel?'':'<span class="ewarn">無電話</span>'}
+      </div></div>`;
+  }).join('');
+}
+function insertEmp(name,en,lid){
+  closeMobOv('mob-db');if(!mob())closeRp();
+  const inp=document.getElementById('msgInput');
+  inp.value+=(inp.value?'\n':'')+'出差人員：'+name+(en?' ('+en+')':'');
+  autoResize(inp);updateSend();
+  if(!document.getElementById('inputbar').style.display||document.getElementById('inputbar').style.display==='none')startChat();
+  inp.focus();
+}
+
+/* CHAT */
+let hist=[],pdfs=[],chatStarted=false;
+
+function handlePDFs(inp){
+  Array.from(inp.files).forEach(f=>{
+    if(f.type!=='application/pdf')return;
+    const r=new FileReader();
+    r.onload=e=>{pdfs.push({name:f.name,b64:e.target.result.split(',')[1]});renderTags();updateSend()};
+    r.readAsDataURL(f);
+  });
+  inp.value='';
+}
+function renderTags(){
+  document.getElementById('pdfTags').innerHTML=pdfs.map((f,i)=>`<div class="ptag">📄 ${f.name.length>30?f.name.substring(0,27)+'…':f.name}<span class="ptag-x" onclick="rmPdf(${i})">✕</span></div>`).join('');
+  document.getElementById('pdfBtn').classList.toggle('has-pdf',pdfs.length>0);
+}
+function rmPdf(i){pdfs.splice(i,1);renderTags();updateSend()}
+function updateSend(){document.getElementById('sendBtn').disabled=!document.getElementById('msgInput').value.trim()&&pdfs.length===0}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';updateSend()}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey&&window.innerWidth>768){e.preventDefault();send()}}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function sbot(){const c=document.getElementById('chat');setTimeout(()=>c.scrollTop=c.scrollHeight,60)}
+
+function startChat(){
+  document.getElementById('welcome').style.display='none';
+  document.getElementById('chat').style.display='flex';
+  document.getElementById('inputbar').style.display='block';
+  document.getElementById('chips').style.display='none';
+  addAI(`您好！我是您的**專屬差旅助手** ✈️\n\n員工資料庫已自動載入 **${VE.length} 位同仁**的完整資料。\n\n請提供以下資訊開始安排：\n• 📄 **機票 PDF**（點左側按鈕上傳）\n• 👤 **出差人員姓名**\n• 🎯 **出差目的與目的地**\n\n上傳機票後將先完成**簽證資料**，再讓您選擇訂房或派車 🚀`);
+  document.getElementById('msgInput').focus();
+}
+const QS={visa:'請幫我整理簽證申請資料',hotel:'🏨 推薦5間飯店並附Agoda連結',car:'🚗 產出標準格式派車單',passport:'⚠️ 檢查本次出差人員護照效期',summary:'📅 幫我整理出差行程摘要'};
+function qs(k){if(!chatStarted)startChat();sc(QS[k])}
+function sc(t){document.getElementById('msgInput').value=t;send()}
+function newChat(){
+  hist=[];pdfs=[];chatStarted=false;
+  document.getElementById('chat').innerHTML='';
+  ['chat','chips','inputbar'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('welcome').style.display='flex';
+  document.getElementById('msgInput').value='';renderTags();
+}
+function addAI(md){
+  const c=document.getElementById('chat');
+  const d=document.createElement('div');d.className='msg ai';
+  d.innerHTML=`<div class="av">✈</div><div class="bubble">${rmd(md)}</div>`;
+  c.appendChild(d);sbot();
+}
+function addTyping(){
+  const c=document.getElementById('chat');
+  const d=document.createElement('div');d.className='msg ai';d.id='typ';
+  d.innerHTML=`<div class="av">✈</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  c.appendChild(d);sbot();
+}
+function rmTyping(){const t=document.getElementById('typ');if(t)t.remove()}
+
+function rmd(t){
+  t=t.replace(/```[\w]*\n?([\s\S]*?)```/g,(_,c)=>'<div class="codeblock">'+esc(c.trim())+'</div><button class="copy-btn" onclick="cpCode(this)">\uD83D\uDCCB \u8907\u88FD</button>');
+  t=t.replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)*)/gm,(_,h,rows)=>{
+    const ths=h.split('|').filter(s=>s.trim()).map(s=>`<th>${lnk(s.trim())}</th>`).join('');
+    const trs=rows.trim().split('\n').map(r=>`<tr>${r.split('|').filter(s=>s.trim()).map(s=>`<td>${lnk(s.trim())}</td>`).join('')}</tr>`).join('');
+    return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+  });
+  t=t.replace(/^> ⚠️(.+)/gm,(_,s)=>`<div class="warn-b">⚠️${s}</div>`);
+  t=t.replace(/^> 💡(.+)/gm,(_,s)=>`<div class="ok-b">💡${s}</div>`);
+  t=t.replace(/^#{1,3} (.+)/gm,(_,s)=>`<div class="stl">${s}</div>`);
+  t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  t=t.replace(/^---$/gm,'<hr>');
+  t=lnk(t);
+  t=t.replace(/^[•\-] (.+)/gm,'<li>$1</li>');
+  t=t.replace(/(<li>[\s\S]*?<\/li>\n?)+/g,s=>`<ul>${s}</ul>`);
+  t=t.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+  return t;
+}
+function lnk(t){return t.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1 ↗</a>')}
+function cpCode(btn){
+  navigator.clipboard.writeText(btn.previousElementSibling.innerText).then(()=>{btn.textContent='✅ 已複製！';setTimeout(()=>btn.textContent='📋 複製',2000)});
+}
+
+async function send(){
+  const inp=document.getElementById('msgInput');
+  const text=inp.value.trim();
+  if(!text&&pdfs.length===0)return;
+  document.getElementById('sendBtn').disabled=true;
+  inp.value='';inp.style.height='auto';
+  const disp=[text,...pdfs.map(f=>'📄 '+f.name)].filter(Boolean).join('\n');
+  const c=document.getElementById('chat');
+  const d=document.createElement('div');d.className='msg user';
+  d.innerHTML=`<div class="bubble">${esc(disp).replace(/\n/g,'<br>')}</div>`;
+  c.appendChild(d);sbot();
+  const parts=[];
+  pdfs.forEach(f=>parts.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:f.b64},title:f.name}));
+  parts.push({type:'text',text:text||'請根據上傳的機票PDF，幫我完整執行簽證規劃。'});
+  hist.push({role:'user',content:parts});
+  pdfs=[];renderTags();
+  addTyping();
+  try{
+    if(!API_KEY){document.getElementById('apikey-modal').classList.remove('hidden');rmTyping();return;}
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,system:getSYS(),messages:hist})});
+    const data=await res.json();
+    if(!res.ok){
+      if(res.status===401){document.getElementById('apikey-modal').classList.remove('hidden');rmTyping();addAI('⚠️ API Key 無效，請點右上角 🔑 重新設定。');return;}
+      throw new Error('HTTP '+res.status);
+    }
+    const reply=data.content?.map(b=>b.text||'').join('')||'抱歉，發生錯誤，請再試一次。';
+    hist.push({role:'assistant',content:reply});
+    rmTyping();addAI(reply);
+    if(!chatStarted){chatStarted=true;document.getElementById('chips').style.display='flex'}
+  }catch(e){
+    rmTyping();
+    if(e.message&&e.message.includes('401')||e.message&&e.message.includes('auth')){
+      document.getElementById('apikey-modal').classList.remove('hidden');
+      addAI('⚠️ API Key 無效或已過期，請重新設定。');
+    } else {
+      addAI('⚠️ 連線發生錯誤，請檢查網路後再試一次。\n\n錯誤：'+e.message);
+    }
+  }
+}
+
+/* CHECKLIST */
+const CL=[
+  {id:1,ic:'✈️',t:'機票訂購及費用請款',sub:'完成後請勾選，將觸發住宿預訂時效',dl:null,rel:false},
+  {id:2,ic:'🏨',t:'住宿預訂',sub:'通知時效：機票勾選後 1 週內',dl:(d,d1)=>sh(d1||d,7),rel:true},
+  {id:3,ic:'🧾',t:'住宿費用請款',sub:'通知時效：出發日期後 1 週',dl:d=>sh(d,7)},
+  {id:4,ic:'🛂',t:'簽證申請及費用請款',sub:'通知時效：出發日期前 2 週',dl:d=>sh(d,-14)},
+  {id:5,ic:'🚗',t:'接送機安排',sub:'通知時效：出發日期前 2 週',dl:d=>sh(d,-14)},
+  {id:6,ic:'💼',t:'通知財務差旅安排',sub:'通知時效：出發日期前 1 個月',dl:d=>sh(d,-30)},
+  {id:7,ic:'🛡️',t:'商旅險保險及費用請款',sub:'通知時效：出發日期前 3 天',dl:d=>sh(d,-3)},
+];
+let trips=[],activeT=null,formCtx=null;
+
+function sh(base,days){if(!base)return null;const d=new Date(base);d.setDate(d.getDate()+days);return d}
+function fd(d){if(!d)return'—';return`${d.getFullYear()}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`}
+function fdi(d){if(!d)return'';return`${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`}
+function dl(d){
+  const now=new Date();now.setHours(0,0,0,0);
+  const n=Math.ceil((d-now)/864e5);
+  if(n<0)return{cls:'urgent',b:`逾期 ${Math.abs(n)} 天`};
+  if(n===0)return{cls:'urgent',b:'今天截止'};
+  if(n<=3)return{cls:'urgent',b:`剩 ${n} 天`};
+  if(n<=14)return{cls:'soon',b:`剩 ${n} 天`};
+  return{cls:'ok',b:`剩 ${n} 天`};
+}
+function detDep(){
+  const txt=hist.map(m=>typeof m.content==='string'?m.content:JSON.stringify(m.content)).join(' ');
+  const m=txt.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  return m?new Date(`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`):null;
+}
+function detNames(){
+  const txt=hist.map(m=>typeof m.content==='string'?m.content:'').join(' ');
+  const found=VE.filter(e=>e.n&&txt.includes(e.n)).map(e=>e.n);
+  return found.length?found.join('、'):'';
+}
+
+function renderClSel(ctx){
+  const selId=ctx==='mob'?'clp-sel-mob':'clp-sel-desk';
+  const barId=ctx==='mob'?'clp-bar-mob':'clp-bar-desk';
+  const sel=document.getElementById(selId);
+  const bar=document.getElementById(barId);
+  if(!sel||!bar)return;
+  if(!trips.length){bar.style.display='none';return}
+  bar.style.display='flex';
+  sel.innerHTML=trips.map(t=>`<option value="${t.id}" ${t.id===activeT?'selected':''}>${t.label}</option>`).join('');
+  updBadge();
+}
+function updBadge(){
+  const n=trips.reduce((a,t)=>{
+    return a+CL.filter(item=>{
+      if(!item.dl||t.checked[item.id])return false;
+      const dd=item.rel?item.dl(t.dep,t.chkD?.[1]):item.dl(t.dep);
+      if(!dd)return false;
+      return Math.ceil((dd-new Date())/864e5)<=7;
+    }).length;
+  },0);
+  const b=document.getElementById('sb-badge');
+  if(b){b.style.display=n>0?'inline':'none';b.textContent=n}
+}
+function switchTrip(v){activeT=v;formCtx=null;renderCL(getCtx())}
+function getCtx(){
+  if(document.getElementById('mob-cl').classList.contains('open'))return'mob';
+  return'desk';
+}
+function bodyEl(ctx){return document.getElementById(ctx==='mob'?'mob-cl-body':'cl-body')}
+
+function showForm(ctx){
+  formCtx=ctx;
+  const dep=detDep(),names=detNames();
+  renderClSel(ctx);
+  const body=bodyEl(ctx);
+  body.innerHTML=`<div class="cl-form">
+    <div><label>出差人員姓名</label><input type="text" id="nf-n" placeholder="例：林翰昱、林峻賢" value="${names}"></div>
+    <div><label>出發日期</label><input type="date" id="nf-d" value="${fdi(dep)}" style="color-scheme:dark"></div>
+    <div class="cl-form-row">
+      <button class="cl-form-cancel" onclick="formCtx=null;renderCL(getCtx())">取消</button>
+      <button class="cl-form-ok" onclick="createTrip()">建立清單 ✓</button>
+    </div></div>`;
+}
+function createTrip(){
+  const names=document.getElementById('nf-n').value.trim()||'出差人員';
+  const dv=document.getElementById('nf-d').value;
+  const dep=dv?new Date(dv):null;
+  const id='t'+Date.now();
+  trips.push({id,label:`${names}　${dep?fd(dep):'日期未定'}`,names,dep,checked:{},chkD:{}});
+  activeT=id;formCtx=null;
+  renderClSel('desk');renderClSel('mob');
+  renderCL(getCtx());
+}
+function confirmDel(ctx){
+  const trip=trips.find(t=>t.id===activeT);if(!trip)return;
+  const body=bodyEl(ctx);
+  const m=document.createElement('div');m.className='del-modal';m.id='del-m';
+  m.innerHTML=`<div class="del-box"><h4>🗑 刪除確認清單</h4><p>確定要刪除「${trip.label}」嗎？此操作無法復原。</p><div class="del-actions"><button class="del-cancel" onclick="document.getElementById('del-m').remove()">取消</button><button class="del-confirm" onclick="execDel('${trip.id}')">確定刪除</button></div></div>`;
+  body.style.position='relative';body.appendChild(m);
+}
+function execDel(id){
+  trips=trips.filter(t=>t.id!==id);
+  const m=document.getElementById('del-m');if(m)m.remove();
+  activeT=trips.length?trips[trips.length-1].id:null;
+  renderClSel('desk');renderClSel('mob');renderCL(getCtx());
+}
+function toggleItem(tid,iid){
+  const trip=trips.find(t=>t.id===tid);if(!trip)return;
+  trip.checked[iid]=!trip.checked[iid];
+  if(trip.checked[iid]){if(!trip.chkD)trip.chkD={};trip.chkD[iid]=new Date()}
+  else if(trip.chkD)delete trip.chkD[iid];
+  renderCL(getCtx());updBadge();
+}
+
+function renderCL(ctx){
+  const body=bodyEl(ctx);if(!body||formCtx)return;
+  const barId=ctx==='mob'?'clp-bar-mob':'clp-bar-desk';
+  const bar=document.getElementById(barId);
+  if(!trips.length){
+    if(bar)bar.style.display='none';
+    body.innerHTML=`<div class="cl-empty"><div class="cl-empty-ic">📋</div><div class="cl-empty-t">尚無出差確認清單</div><div class="cl-empty-s">點擊「＋ 新增」建立清單<br>系統自動帶入對話中的出發日期與人員</div><button class="cl-empty-btn" onclick="showForm('${ctx}')">＋ 建立第一份清單</button></div>`;
+    return;
+  }
+  if(bar)bar.style.display='flex';
+  const trip=trips.find(t=>t.id===activeT)||trips[trips.length-1];
+  activeT=trip.id;
+  const selEl=document.getElementById(ctx==='mob'?'clp-sel-mob':'clp-sel-desk');
+  if(selEl)selEl.value=activeT;
+  const done=CL.filter(i=>trip.checked[i.id]).length;
+  const pct=Math.round(done/CL.length*100);
+  let html=`<div class="cl-prog"><div class="cl-prog-top"><span class="cl-prog-lbl">✈️ ${trip.names}&nbsp;｜&nbsp;${trip.dep?fd(trip.dep):'日期未定'}</span><span class="cl-prog-n">${done}/${CL.length}</span></div><div class="cl-prog-bar"><div class="cl-prog-fill" style="width:${pct}%"></div></div></div>`;
+  if(!trip.dep)html+=`<div class="cl-hint">⚠️ 未設定出發日期，時效提醒無法計算</div>`;
+  CL.forEach(item=>{
+    const chk=!!trip.checked[item.id];
+    let dd=null;
+    if(item.dl)dd=item.rel?item.dl(trip.dep,trip.chkD?.[1]):item.dl(trip.dep);
+    let dlBar='';
+    if(dd){
+      const{cls,b}=dl(dd);
+      const cs=dd.toISOString().split('T')[0];
+      dlBar=`<div class="cl-dl"><div class="cl-dl-lbl">⏰ ${item.sub.replace('通知時效：','')}</div><div class="cl-dl-date ${chk?'':cls}">${chk?'✅ 已完成':fd(dd)}</div>${!chk?`<div class="cl-dl-row"><span class="cl-bdg ${cls}">${b}</span><button class="cal-btn" onclick="gcal('${item.t}','${cs}','${item.sub}')">📅 加入行事曆</button></div>`:''}</div>`;
+    }else if(item.id===1){
+      dlBar=`<div class="cl-dl"><div class="cl-dl-lbl">完成後請勾選，將觸發住宿預訂 1 週時效</div></div>`;
+    }else if(!trip.dep){
+      dlBar=`<div class="cl-dl"><div class="cl-dl-lbl">⏰ ${item.sub.replace('通知時效：','')}</div><div class="cl-dl-date" style="color:var(--t5)">需設定出發日期</div><div class="cl-dl-row"><button class="cal-btn" onclick="gcal('${item.t}','','${item.sub}')">📅 行事曆</button></div></div>`;
+    }
+    html+=`<div class="cl-item ${chk?'done':''}"><div class="cl-item-top"><div class="cl-num">${item.id}</div><div class="cl-chk ${chk?'checked':''}" onclick="toggleItem('${trip.id}',${item.id})"></div><div class="cl-content"><div class="cl-ttl">${item.ic} ${item.t}</div><div class="cl-sub">${chk?'已完成 ✓':item.sub}</div></div></div>${dlBar}</div>`;
+  });
+  body.innerHTML=html;updBadge();
+}
+function gcal(title,ds,details){
+  const d=ds?ds.replace(/-/g,''):'';
+  const base='https://calendar.google.com/calendar/render?action=TEMPLATE';
+  const p=`&text=${encodeURIComponent('【差旅提醒】'+title)}&details=${encodeURIComponent(details+'\n由差旅助手建立')}&sf=true&output=xml`;
+  window.open(d?`${base}${p}&dates=${d}/${d}`:`${base}${p}`,'_blank');
+}
+
+/* INIT */
+document.getElementById('msgInput').addEventListener('input',updateSend);
+renderDB(VE,'dbList');
+renderDB(VE,'mobDbList');
+// Sync mob-only buttons visibility
+(function syncMob(){
+  const m=window.innerWidth<=768;
+  document.querySelectorAll('.mob-only').forEach(el=>el.style.display=m?'flex':'none');
+})();
+window.addEventListener('resize',function(){
+  const m=window.innerWidth<=768;
+  document.querySelectorAll('.mob-only').forEach(el=>el.style.display=m?'flex':'none');
+});
+
+/* API KEY MANAGEMENT */
+let API_KEY = localStorage.getItem('ta_api_key') || '';
+
+function checkAkBtn(){
+  const v = document.getElementById('ak-input').value.trim();
+  const btn = document.getElementById('ak-btn');
+  if(btn) btn.style.opacity = v.length > 5 ? '1' : '0.5';
+  const err = document.getElementById('ak-err');
+  if(err) err.style.display = 'none';
+}
+
+function saveApiKey(){
+  const v = document.getElementById('ak-input').value.trim();
+  if(!v || v.length < 5){
+    document.getElementById('ak-err').style.display = 'block';
+    document.getElementById('ak-err').textContent = '請輸入有效的 API Key';
+    return;
+  }
+  API_KEY = v;
+  localStorage.setItem('ta_api_key', v);
+  document.getElementById('apikey-modal').classList.add('hidden');
+}
+
+// Show modal if no key saved
+(function initApiKey(){
+  // Wire up modal events
+  const akInput = document.getElementById('ak-input');
+  const akBtn = document.getElementById('ak-btn');
+  if(akInput) akInput.addEventListener('input', checkAkBtn);
+  if(akBtn) akBtn.addEventListener('click', saveApiKey);
+  
+  if(API_KEY && API_KEY.length > 10){
+    document.getElementById('apikey-modal').classList.add('hidden');
+  }
+  // Add "change key" button to header
+  const hbtns = document.querySelector('.hbtns');
+  if(hbtns){
+    const btn = document.createElement('button');
+    btn.className = 'hbtn';
+    btn.title = '重新設定 API Key';
+    btn.textContent = '🔑';
+    btn.onclick = () => {
+      document.getElementById('ak-input').value = API_KEY;
+      document.getElementById('ak-btn').disabled = false;
+      document.getElementById('apikey-modal').classList.remove('hidden');
+    };
+    hbtns.insertBefore(btn, hbtns.firstChild);
+  }
+})();
+
+</script>
+
+<!-- API KEY MODAL -->
+<div id="apikey-modal">
+  <div class="ak-box">
+    <div class="ak-logo">🔑</div>
+    <div class="ak-title">設定 API Key</div>
+    <div class="ak-sub">
+      差旅助手需要 Anthropic API Key 才能運作<br>
+      <a href="https://console.anthropic.com/account/keys" target="_blank">點此取得 API Key ↗</a>
+    </div>
+    <div class="ak-label">Anthropic API Key</div>
+    <input class="ak-input" id="ak-input" type="password" placeholder="sk-ant-api03-..." >
+    <div class="ak-err" id="ak-err">API Key 格式不正確，請確認後再試</div>
+    <button class="ak-btn" id="ak-btn" onclick="saveApiKey()">開始使用 →</button>
+    <div class="ak-note">Key 僅儲存在您的瀏覽器本機（localStorage），不會傳送至任何第三方</div>
+  </div>
+</div>
+
+</body>
+</html>
